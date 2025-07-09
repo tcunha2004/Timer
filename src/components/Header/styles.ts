@@ -23,13 +23,13 @@ export const HeaderContainer = styled.header`
     border-top: 3px solid transparent; /* pra ele não subir a posição do icone no hover (se quiser tente comentar isso e veja) */
     border-bottom: 3px solid transparent;
 
+    &:hover {
+      border-bottom: 3px solid ${(props) => props.theme["green-500"]};
+    }
+
     &.active {
       color: ${(props) => props.theme["green-500"]};
     }
-  }
-
-  a:hover {
-    border-bottom: 3px solid ${(props) => props.theme["green-500"]};
   }
 
   svg {
