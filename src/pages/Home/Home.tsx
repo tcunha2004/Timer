@@ -19,10 +19,23 @@ function Home() {
             type="text"
             id="task"
             placeholder="Dê um nome para a sua tarefa"
+            list="task-suggestions"
           />
 
+          <datalist id="task-suggestions">
+            <option value="Fazer arroz" />
+            <option value="Estudar" />
+          </datalist>
+
           <label htmlFor="durationMinutes">durante</label>
-          <DurationInput type="number" id="durationMinutes" placeholder="00" />
+          <DurationInput
+            type="number"
+            id="durationMinutes"
+            placeholder="00"
+            step={5}
+            min={5}
+            max={60}
+          />
 
           <span>minutos</span>
         </FormContainer>

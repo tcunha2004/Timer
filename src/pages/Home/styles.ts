@@ -47,6 +47,10 @@ const CommonInputConfigs = styled.input`
 
 export const TaskInput = styled(CommonInputConfigs)`
   flex: 1;
+
+  &::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
 `;
 
 export const DurationInput = styled(CommonInputConfigs)`
