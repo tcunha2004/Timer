@@ -8,8 +8,14 @@ import {
   StartCountDownButton,
   TaskInput,
 } from "./styles";
+import { useForm } from "react-hook-form";
 
 function Home() {
+  const { register, watch } = useForm();
+
+  const taskWatcher = watch("task");
+  const minutesWatcher = watch("minutesAmount");
+
   return (
     <HomeContainer>
       <form action="">
@@ -20,11 +26,12 @@ function Home() {
             id="task"
             placeholder="Dê um nome para a sua tarefa"
             list="task-suggestions"
+            {...register("task")}
           />
 
           <datalist id="task-suggestions">
-            <option value="Fazer arroz" />
-            <option value="Estudar" />
+            <option value="Study" />
+            <option value="Clean the kitchen" />
           </datalist>
 
           <label htmlFor="durationMinutes">durante</label>
@@ -35,6 +42,7 @@ function Home() {
             step={5}
             min={5}
             max={60}
+            {...register("minutesAmount", { valueAsNumber: true })}
           />
 
           <span>minutos</span>
@@ -48,7 +56,10 @@ function Home() {
           <span>0</span>
         </CountDownContainer>
 
-        <StartCountDownButton type="submit" disabled>
+        <StartCountDownButton
+          disabled={!taskWatcher || !minutesWatcher}
+          type="submit"
+        >
           <BiPlay size={24} />
           Começar
         </StartCountDownButton>
