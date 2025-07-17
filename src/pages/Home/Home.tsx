@@ -16,16 +16,17 @@ function Home() {
 
   const taskWatcher = watch("task"); // useForm esta observando os inputs registrados
   const minutesWatcher = watch("minutesAmount"); // useForm esta observando os inputs registrados
-  // ---------------------------------------------------------------------------------------------------------------
+
+  const [cycles, setCycles] = useState<Cycle[]>([]); // o useState armazenará uma lista de ciclos
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null); // (começa com null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+
   interface Cycle {
     id: string;
     task: string;
     minutesAmount: number;
   }
 
-  const [cycles, setCycles] = useState<Cycle[]>([]); // o useState armazenará uma lista de ciclos
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null); // id do ciclo ativo no momento (começa com null)
-  // ---------------------------------------------------------------------------------------------------------------
   interface FormData {
     task: string;
     minutesAmount: number;
@@ -39,15 +40,24 @@ function Home() {
       minutesAmount: data.minutesAmount,
     };
 
-    setCycles((prevState) => [...prevState, newCycle]); // concateno o que tinha antes com o que vou add
+    setCycles((prevState) => [...prevState, newCycle]);
     setActiveCycleId(newCycle.id);
 
-    reset(); // reseta o formulário quando der o submit
+    reset();
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
 
-  console.log(activeCycle);
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+  const currentTotalSeconds = activeCycle
+    ? totalSeconds - amountSecondsPassed
+    : 0;
+
+  const minutesNum = Math.floor(currentTotalSeconds / 60); // arredonda pra baixo (pega os minutos cheios)
+  const secondsNum = currentTotalSeconds % 60; // pega o resto (segundos)
+
+  const minutes = String(minutesNum).padStart(2, "0"); // obriga a string a ter 2 caracteres, e se não tiver, adiciona 0 no 'start'
+  const seconds = String(secondsNum).padStart(2, "0");
 
   return (
     <HomeContainer>
@@ -82,11 +92,11 @@ function Home() {
         </FormContainer>
 
         <CountDownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span> {/* primeira letra */}
+          <span>{minutes[1]}</span> {/* segunda letra */}
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountDownContainer>
 
         <StartCountDownButton
