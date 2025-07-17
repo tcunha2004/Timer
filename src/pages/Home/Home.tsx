@@ -11,14 +11,23 @@ import {
 import { useForm } from "react-hook-form";
 
 function Home() {
-  const { register, watch } = useForm();
+  const { register, watch, handleSubmit, reset } = useForm<FormData>(); // useForm: controlador do formulario
 
-  const taskWatcher = watch("task");
+  const taskWatcher = watch("task"); // useForm esta observando os inputs registrados
   const minutesWatcher = watch("minutesAmount");
+
+  interface FormData {
+    task: string;
+    minutesAmount: number;
+  }
+
+  function handleFormSubmit(data: FormData) {
+    reset(); // reseta o formulário quando der o submit
+  }
 
   return (
     <HomeContainer>
-      <form action="">
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
@@ -26,7 +35,7 @@ function Home() {
             id="task"
             placeholder="Dê um nome para a sua tarefa"
             list="task-suggestions"
-            {...register("task")}
+            {...register("task")} // registrando os inputs pro useForm controlar
           />
 
           <datalist id="task-suggestions">
@@ -42,7 +51,7 @@ function Home() {
             step={5}
             min={5}
             max={60}
-            {...register("minutesAmount", { valueAsNumber: true })}
+            {...register("minutesAmount", { valueAsNumber: true })} // registrando os inputs pro useForm controlar
           />
 
           <span>minutos</span>
