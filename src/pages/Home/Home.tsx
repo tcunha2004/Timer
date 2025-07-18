@@ -9,7 +9,8 @@ import {
   TaskInput,
 } from "./styles";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { differenceInSeconds } from "date-fns";
 
 function Home() {
   const { register, watch, handleSubmit, reset } = useForm<FormData>(); // useForm: controlador do formulario
@@ -25,25 +26,12 @@ function Home() {
     id: string;
     task: string;
     minutesAmount: number;
+    startDate: Date;
   }
 
   interface FormData {
     task: string;
     minutesAmount: number;
-  }
-
-  function handleFormSubmit(data: FormData) {
-    // crio um novo ciclo (seguindo a interface de como deve ser um ciclo)
-    const newCycle: Cycle = {
-      id: String(new Date().getTime()),
-      task: data.task,
-      minutesAmount: data.minutesAmount,
-    };
-
-    setCycles((prevState) => [...prevState, newCycle]);
-    setActiveCycleId(newCycle.id);
-
-    reset();
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
@@ -58,6 +46,31 @@ function Home() {
 
   const minutes = String(minutesNum).padStart(2, "0"); // obriga a string a ter 2 caracteres, e se não tiver, adiciona 0 no 'start'
   const seconds = String(secondsNum).padStart(2, "0");
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
+    }
+  }, [activeCycle]);
+
+  function handleFormSubmit(data: FormData) {
+    // crio um novo ciclo (seguindo a interface de como deve ser um ciclo)
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    };
+
+    setCycles((prevState) => [...prevState, newCycle]);
+    setActiveCycleId(newCycle.id);
+
+    reset();
+  }
 
   return (
     <HomeContainer>
