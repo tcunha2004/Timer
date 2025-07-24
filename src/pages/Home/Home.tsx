@@ -30,6 +30,7 @@ function Home() {
     minutesAmount: number;
     startDate: Date;
     interruptedDate?: Date; // opcional
+    finishedDate?: Date; // opcional
   }
 
   interface FormData {
@@ -55,16 +56,34 @@ function Home() {
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate)
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate
         );
+
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id == activeCycleId) {
+                return { ...cycle, finishedDate: new Date() };
+              } else {
+                return cycle;
+              }
+            })
+          );
+
+          setAmountSecondsPassed(totalSeconds); // volta o contador pra 0 pois já se passaram todos os segundos
+          clearInterval(interval);
+        } else {
+          setAmountSecondsPassed(secondsDifference);
+        }
       }, 1000);
     }
 
     return () => {
       clearInterval(interval); // quando chamar o useEffect de novo, limpa o intervalo e começa um novo
     };
-  }, [activeCycle]);
+  }, [activeCycle, totalSeconds, activeCycleId]);
 
   function handleFormSubmit(data: FormData) {
     // crio um novo ciclo (seguindo a interface de como deve ser um ciclo)
@@ -89,8 +108,8 @@ function Home() {
   }, [minutes, seconds, activeCycle]);
 
   function handleInterruptCycle() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         // se o ciclo estava ativo e for interrompido, retornamos com o atributo interruptedDate
         if (cycle.id == activeCycleId) {
           return { ...cycle, interruptedDate: new Date() };
@@ -102,8 +121,6 @@ function Home() {
 
     setActiveCycleId(null);
   }
-
-  console.log(cycles);
 
   return (
     <HomeContainer>
@@ -130,7 +147,7 @@ function Home() {
             id="durationMinutes"
             placeholder="00"
             step={5}
-            min={5}
+            min={1}
             max={60}
             {...register("minutesAmount", { valueAsNumber: true })} // registrando os inputs pro useForm controlar
             disabled={!!activeCycle} // !! -> boolean (tem algum valor?)
