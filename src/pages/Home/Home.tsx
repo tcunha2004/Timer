@@ -6,11 +6,13 @@ import {
   HomeContainer,
   Separator,
   StartCountDownButton,
+  StopCountDownButton,
   TaskInput,
 } from "./styles";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { differenceInSeconds } from "date-fns";
+import { TbHandStop } from "react-icons/tb";
 
 function Home() {
   const { register, watch, handleSubmit, reset } = useForm<FormData>(); // useForm: controlador do formulario
@@ -27,6 +29,7 @@ function Home() {
     task: string;
     minutesAmount: number;
     startDate: Date;
+    interruptedDate?: Date; // opcional
   }
 
   interface FormData {
@@ -85,6 +88,23 @@ function Home() {
     }
   }, [minutes, seconds, activeCycle]);
 
+  function handleInterruptCycle() {
+    setCycles(
+      cycles.map((cycle) => {
+        // se o ciclo estava ativo e for interrompido, retornamos com o atributo interruptedDate
+        if (cycle.id == activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() };
+        } else {
+          return cycle;
+        }
+      })
+    );
+
+    setActiveCycleId(null);
+  }
+
+  console.log(cycles);
+
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -96,6 +116,7 @@ function Home() {
             placeholder="Dê um nome para a sua tarefa"
             list="task-suggestions"
             {...register("task")} // registrando os inputs pro useForm controlar
+            disabled={!!activeCycle} // !! -> boolean (tem algum valor?)
           />
 
           <datalist id="task-suggestions">
@@ -112,6 +133,7 @@ function Home() {
             min={5}
             max={60}
             {...register("minutesAmount", { valueAsNumber: true })} // registrando os inputs pro useForm controlar
+            disabled={!!activeCycle} // !! -> boolean (tem algum valor?)
           />
 
           <span>minutos</span>
@@ -125,13 +147,20 @@ function Home() {
           <span>{seconds[1]}</span>
         </CountDownContainer>
 
-        <StartCountDownButton
-          disabled={!taskWatcher || !minutesWatcher}
-          type="submit"
-        >
-          <BiPlay size={24} />
-          Começar
-        </StartCountDownButton>
+        {activeCycle ? (
+          <StopCountDownButton onClick={handleInterruptCycle} type="button">
+            <TbHandStop size={24} />
+            Interromper
+          </StopCountDownButton>
+        ) : (
+          <StartCountDownButton
+            disabled={!taskWatcher || !minutesWatcher}
+            type="submit"
+          >
+            <BiPlay size={24} />
+            Começar
+          </StartCountDownButton>
+        )}
       </form>
     </HomeContainer>
   );
