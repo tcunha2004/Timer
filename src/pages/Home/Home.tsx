@@ -48,13 +48,19 @@ function Home() {
   const seconds = String(secondsNum).padStart(2, "0");
 
   useEffect(() => {
+    let interval: number;
+
     if (activeCycle) {
-      setInterval(() => {
+      interval = setInterval(() => {
         setAmountSecondsPassed(
           differenceInSeconds(new Date(), activeCycle.startDate)
         );
       }, 1000);
     }
+
+    return () => {
+      clearInterval(interval); // quando chamar o useEffect de novo, limpa o intervalo e começa um novo
+    };
   }, [activeCycle]);
 
   function handleFormSubmit(data: FormData) {
@@ -68,9 +74,16 @@ function Home() {
 
     setCycles((prevState) => [...prevState, newCycle]);
     setActiveCycleId(newCycle.id);
+    setAmountSecondsPassed(0); // volta pra 0 quando criar um novo ciclo @D058
 
     reset();
   }
+
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`;
+    }
+  }, [minutes, seconds, activeCycle]);
 
   return (
     <HomeContainer>
