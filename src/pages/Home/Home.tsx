@@ -1,18 +1,15 @@
 import { BiPlay } from "react-icons/bi";
 import {
-  CountDownContainer,
-  DurationInput,
-  FormContainer,
   HomeContainer,
-  Separator,
   StartCountDownButton,
   StopCountDownButton,
-  TaskInput,
 } from "./styles";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { differenceInSeconds } from "date-fns";
 import { TbHandStop } from "react-icons/tb";
+import CycleForm from "./components/CycleForm/CycleForm";
+import Countdown from "./components/Countdown/Countdown";
 
 function Home() {
   const { register, watch, handleSubmit, reset } = useForm<FormData>(); // useForm: controlador do formulario
@@ -125,44 +122,8 @@ function Home() {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
-        <FormContainer>
-          <label htmlFor="task">Vou trabalhar em</label>
-          <TaskInput
-            type="text"
-            id="task"
-            placeholder="Dê um nome para a sua tarefa"
-            list="task-suggestions"
-            {...register("task")} // registrando os inputs pro useForm controlar
-            disabled={!!activeCycle} // !! -> boolean (tem algum valor?)
-          />
-
-          <datalist id="task-suggestions">
-            <option value="Study" />
-            <option value="Clean the kitchen" />
-          </datalist>
-
-          <label htmlFor="durationMinutes">durante</label>
-          <DurationInput
-            type="number"
-            id="durationMinutes"
-            placeholder="00"
-            step={5}
-            min={1}
-            max={60}
-            {...register("minutesAmount", { valueAsNumber: true })} // registrando os inputs pro useForm controlar
-            disabled={!!activeCycle} // !! -> boolean (tem algum valor?)
-          />
-
-          <span>minutos</span>
-        </FormContainer>
-
-        <CountDownContainer>
-          <span>{minutes[0]}</span> {/* primeira letra */}
-          <span>{minutes[1]}</span> {/* segunda letra */}
-          <Separator>:</Separator>
-          <span>{seconds[0]}</span>
-          <span>{seconds[1]}</span>
-        </CountDownContainer>
+        <CycleForm />
+        <Countdown />
 
         {activeCycle ? (
           <StopCountDownButton onClick={handleInterruptCycle} type="button">
